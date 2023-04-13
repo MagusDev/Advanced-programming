@@ -4,15 +4,16 @@
 #include <sstream>
 #include <fstream>
 #include <cstdlib>
-#include <unordered_set>
-#include <cmath>
 using namespace std;
 
 const char TIME_SEPARATOR = '-';
 const char MEMBER_SEPARATOR = '$';
 const string LINE_SEPARATOR = "---";
-const int NON_VALID = -8888;
-const int WORKING_DAYS = 30;
+
+
+
+
+
 
 class SalaryConfig {
 public:
@@ -29,15 +30,7 @@ public:
 		return level;
 	}
 
-	int calcTotalEarning(int hours) {
-		return calcRawSalary(hours) * (100 - taxPercentage) / 100;
-	}
-
-	int calcTax(int hours) {
-		return calcRawSalary(hours) * taxPercentage / 100;
-	}
-
-	int calcRawSalary(int hours)
+	int calcSalary(int hours)
 	{
 		int salary = 0;
 		if (hours < officialWorkingHours) {
@@ -47,7 +40,7 @@ public:
 			salary += officialWorkingHours * salaryPerHour + (hours - officialWorkingHours) * salaryPerExtraHour;
 		}
 
-		return salary;
+		return salary * (100 - taxPercentage) / 100;
 	}
 
 	void printInfo() {
@@ -116,35 +109,19 @@ public:
 		name = _name;
 		age = _age;
 		level = _level;
-		team_id = -8888;
-		bonus = 0;
 	}
-
-	void printMinimalReportSalary() {
-		cout << "ID: " << id << endl;
-		cout << "Name: " << name << endl;
-		cout << "Total Working Hours: " << getTotalWorkingHours() << endl;
-		cout << "Total Earning: " << getTotalEarning() << endl;
-		cout << LINE_SEPARATOR << endl;
-	}
-
-	void printFullReportSalary() {
-		cout << "ID: " << id << endl;
-		cout << "Name: " << name << endl;
-		cout << "Age: " << age << endl;
-		cout << "Level: " << level << endl;
-		if (team_id == NON_VALID) {
-			cout << "Team ID: N/A" << endl;
+	void printInfo() {
+		cout << "id: " << id << endl;
+		cout << "name: " << name << endl;
+		cout << "age: " << age << endl;
+		cout << "level: " << level << endl;
+		calcTotalWorkingHours();
+		for (auto workingHour : workingHours) {
+			//workingHour->printInfo();
 		}
-		else {
-			cout << "Team ID: " << team_id << endl;
-		}
-		cout << "Total Working Hours: " << getTotalWorkingHours() << endl;
-		cout << "Absent Days: " << getAbsentDays() << endl;
-		cout << "Salary: " << getRawSalary() << endl;
-		cout << "Bonus: " << bonus << endl;
-		cout << "Tax: " << getTax() << endl;
-		cout << "Total Earning: " << getTotalEarning() << endl;
+
+		cout << "salary: " << getSalary() << endl;
+		config->printInfo();
 	}
 
 	void assignWorkingHour(WorkingHour& _workingHour) {
@@ -157,35 +134,16 @@ public:
 		return id;
 	}
 
-	string getName() {
-		return name;
-	}
-
-	int getTotalWorkingHours() {
-		int totalWorkingHours = 0;
-		for (auto wh : workingHours) {
-			totalWorkingHours += wh->getIntervalLength();
-		}
-		return totalWorkingHours;
-	}
-
 	void assignTeamID(int _team_id) {
 		team_id = _team_id;
 	}
 
-	int getRawSalary() {
-		return config->calcRawSalary(getTotalWorkingHours());
+	int getSalary() {
+		calcTotalWorkingHours();
+		return config->calcSalary(totalWorkingHours);
 	}
 
-	int getTax() {
-		return config->calcTax(getTotalWorkingHours());
-	}
-
-	int getTotalEarning() {
-		return config->calcTotalEarning(getTotalWorkingHours());
-	}
-
-	void assignConfig(vector<SalaryConfig> &configs) {
+	void assignConfig(vector<SalaryConfig>& configs) {
 		for (int c = 0; c < configs.size(); c++) {
 			if (configs[c].getLevel() == level) {
 				config = &configs[c];
@@ -200,15 +158,14 @@ private:
 	string level;
 	SalaryConfig* config;
 	vector<WorkingHour*> workingHours;
+	int totalWorkingHours;
 	int team_id;
-	int bonus;
 
-	int getAbsentDays() {
-		unordered_set<int> workDays;
+	void calcTotalWorkingHours() {
+		totalWorkingHours = 0;
 		for (auto wh : workingHours) {
-			workDays.insert(wh->getDay());
+			totalWorkingHours += wh->getIntervalLength();
 		}
-		return WORKING_DAYS - workDays.size();
 	}
 
 };
@@ -221,24 +178,21 @@ public:
 		memberIDs = extractMemberIDs(_memberIDs);
 		bonus_min_working_hours = _bonus_min_working_hours;
 		bonus_working_hours_max_variance = _bonus_working_hours_max_variance;
-		bonus = 0;
 	}
 
-	void printReportSalary() {
-		cout << "ID: " << team_id << endl;
-		cout << "Head ID: " << teamHead->getID() << endl;
-		cout << "Head Name: " << teamHead->getName() << endl;
-		cout << "Team Total Working Hours: " << getTotalWorkingHours() << endl;
-		cout << "Average Member Working Hour: " << round(getTotalWorkingHours()/members.size()) << endl;
-		cout << "Bonus: " << bonus << endl;
-		cout << LINE_SEPARATOR << endl;
+	void printInfo() {
+		cout << "Team ID: " << team_id << endl;
+		cout << "Team Head: " << endl;
+		teamHead->printInfo();
+		cout << "Members: " << endl;
 		for (auto m : members) {
-			cout << "Member ID: " << m->getID() << endl;
-			cout << "Total Earning: " << m->getTotalEarning() << endl;
+			m->printInfo();
 			cout << LINE_SEPARATOR << endl;
 		}
+		cout << "bonus min hours: " << bonus_min_working_hours << endl;
+		cout << "bonus max variance: " << bonus_working_hours_max_variance << endl;
 	}
-	
+
 	int getTeamID() {
 		return team_id;
 	}
@@ -263,7 +217,6 @@ private:
 	vector<Employee*> members;
 	int bonus_min_working_hours;
 	float bonus_working_hours_max_variance;
-	int bonus;
 
 	vector<int> extractMemberIDs(string input_str) {
 		vector<int> memberIDs;
@@ -273,14 +226,6 @@ private:
 			memberIDs.push_back(stoi(id));
 		}
 		return memberIDs;
-	}
-
-	int getTotalWorkingHours() {
-		int totalWorkingHours = 0;
-		for (auto m : members) {
-			totalWorkingHours += m->getTotalWorkingHours();
-		}
-		return totalWorkingHours;
 	}
 
 };
@@ -373,31 +318,20 @@ vector<string> splitToWords(string line)
 	return words;
 }
 
-void reportSalaries(const vector<Employee>& employees) {
-	for (auto e : employees)
-	{
-		e.printMinimalReportSalary();
-	}
-}
-
-void reportEmployeeSalary(const vector<Employee>& employees, int id) {
-	for (auto e : employees) {
-		if (e.getID() == id) {
-			e.printFullReportSalary();
+void reportTotalHoursPerDay(vector<WorkingHour> workingHours,int startDay,int endDay) {
+	for (int day = startDay; day <= endDay; day++) {
+		int totalHours = 0;
+		for (auto wh : workingHours) {
+			if (wh.getDay() == day) {
+				totalHours += wh.getIntervalLength();
+			}
 		}
-	}
-}
-
-void reportTeamSalary(const vector<Team>& teams, int teamID) {
-	for (auto t : teams) {
-		if (t.getTeamID() == teamID) {
-			t.printReportSalary();
-		}
+		cout << "Day #" << day << ": " <<totalHours<< endl;
 	}
 }
 
 void cammandHandler(vector<Employee>& employees, vector<Team>& teams,
-					vector<WorkingHour>& workingHours, vector<SalaryConfig>& salaryConfigs) {
+	vector<WorkingHour>& workingHours, vector<SalaryConfig>& salaryConfigs) {
 	string line;
 	while (getline(cin, line))
 	{
@@ -405,19 +339,19 @@ void cammandHandler(vector<Employee>& employees, vector<Team>& teams,
 
 		if (words[0] == "report_salaries")
 		{
-			reportSalaries(employees);
+			//reportSalaries(employees);
 		}
 		else if (words[0] == "report_employee_salary")
 		{
-			reportEmployeeSalary(employees, stoi(words[1]));
+			//reportEmployeeSalary(employees, stoi(words[1]));
 		}
 		else if (words[0] == "report_team_salary")
 		{
-			reportTeamSalary(teams, stoi(words[1]));
+			//reportTeamSalary(teams, stoi(words[1]));
 		}
 		else if (words[0] == "report_total_hours_per_day")
 		{
-			//reportTotalHoursPerDay(workingHours, stoi(words[1]), stoi(words[2]));
+			reportTotalHoursPerDay(workingHours, stoi(words[1]), stoi(words[2]));
 		}
 		else if (words[0] == "report_employee_per_hour")
 		{
@@ -492,3 +426,5 @@ int main() {
 	*/
 	return 0;
 }
+
+

@@ -381,18 +381,28 @@ void reportSalaries(const vector<Employee>& employees) {
 }
 
 void reportEmployeeSalary(const vector<Employee>& employees, int id) {
+	bool isFound = false;
 	for (auto e : employees) {
 		if (e.getID() == id) {
 			e.printFullReportSalary();
+			isFound = true;
 		}
+	}
+	if (!isFound) {
+		cout << "EMPLOYEE_NOT_FOUND" << endl;
 	}
 }
 
 void reportTeamSalary(const vector<Team>& teams, int teamID) {
+	bool isFound = false;
 	for (auto t : teams) {
 		if (t.getTeamID() == teamID) {
 			t.printReportSalary();
+			isFound = true;
 		}
+	}
+	if (!isFound) {
+		cout << "TEAM_NOT_FOUND" << endl;
 	}
 }
 

@@ -13,6 +13,9 @@ const char MEMBER_SEPARATOR = '$';
 const string LINE_SEPARATOR = "---";
 const int NON_VALID = -8888;
 const int WORKING_DAYS = 30;
+const string EMPLOYEE_NOT_FOUND = "EMPLOYEE_NOT_FOUND";
+const string TEAM_NOT_FOUND = "TEAM_NOT_FOUND";
+const string INVALID_LEVEL = "INVALID_LEVEL";
 
 class SalaryConfig {
 public:
@@ -49,14 +52,13 @@ public:
 
 		return salary;
 	}
-
-	void printInfo() {
-		cout << "level: " << level << endl;
-		cout << "baseSalary: " << baseSalary << endl;
-		cout << "salaryPerHour: " << salaryPerHour << endl;
-		cout << "salaryPerExtraHour: " << salaryPerExtraHour << endl;
-		cout << "officialWorkingHours: " << officialWorkingHours << endl;
-		cout << "taxPercentage: " << taxPercentage << endl;
+	
+	void printConfig() {
+		cout << "Base Salary: " << baseSalary << endl;
+		cout << "Salary Per Hour: " << salaryPerHour << endl;
+		cout << "Salary Per Extra Hour: " << salaryPerExtraHour << endl;
+		cout << "Official Working Hours: " << officialWorkingHours << endl;
+		cout << "Tax: " << taxPercentage << "%" << endl;
 	}
 
 private:
@@ -229,7 +231,7 @@ public:
 		cout << "Head ID: " << teamHead->getID() << endl;
 		cout << "Head Name: " << teamHead->getName() << endl;
 		cout << "Team Total Working Hours: " << getTotalWorkingHours() << endl;
-		cout << "Average Member Working Hour: " << round(getTotalWorkingHours()/members.size()) << endl;
+		cout << "Average Member Working Hour: " << round(getTotalWorkingHours() / members.size()) << endl;
 		cout << "Bonus: " << bonus << endl;
 		cout << LINE_SEPARATOR << endl;
 		for (auto m : members) {
@@ -238,7 +240,7 @@ public:
 			cout << LINE_SEPARATOR << endl;
 		}
 	}
-	
+
 	int getTeamID() {
 		return team_id;
 	}
@@ -389,7 +391,7 @@ void reportEmployeeSalary(const vector<Employee>& employees, int id) {
 		}
 	}
 	if (!isFound) {
-		cout << "EMPLOYEE_NOT_FOUND" << endl;
+		cout << EMPLOYEE_NOT_FOUND << endl;
 	}
 }
 
@@ -402,9 +404,10 @@ void reportTeamSalary(const vector<Team>& teams, int teamID) {
 		}
 	}
 	if (!isFound) {
-		cout << "TEAM_NOT_FOUND" << endl;
+		cout << TEAM_NOT_FOUND << endl;
 	}
 }
+
 
 int calcTotalHoursInDay(vector<WorkingHour> workingHours, int day) {
 	int totalHours = 0;
@@ -446,7 +449,32 @@ vector<int> getMinIndices(vector<int> v) {
 		}
 		else if (v[i] == minValue) {
 			minIndices.push_back(i);
+}
+    
+    
+void reportTotalHoursPerDay(vector<WorkingHour> workingHours, int startDay, int endDay) {
+	for (int day = startDay; day <= endDay; day++) {
+		int totalHours = 0;
+		for (auto wh : workingHours) {
+			if (wh.getDay() == day) {
+				totalHours += wh.getIntervalLength();
+			}
 		}
+		cout << "Day #" << day << ": " << totalHours << endl;
+	}
+}
+
+void showSalaryConfig(const vector<SalaryConfig>& salaryConfigs, string level) {
+	bool isFound = false;
+	for (auto sc : salaryConfigs) {
+		if (sc.getLevel() == level) {
+			sc.printConfig();
+			isFound = true;
+		}
+	}
+	if (!isFound) {
+		cout << INVALID_LEVEL << endl;
+
 	}
 	return minIndices;
 }
@@ -484,7 +512,7 @@ void reportTotalHoursPerDay(vector<WorkingHour> workingHours, int startDay, int 
 
 
 void cammandHandler(vector<Employee>& employees, vector<Team>& teams,
-					vector<WorkingHour>& workingHours, vector<SalaryConfig>& salaryConfigs) {
+	vector<WorkingHour>& workingHours, vector<SalaryConfig>& salaryConfigs) {
 	string line;
 	while (getline(cin, line))
 	{
@@ -512,7 +540,7 @@ void cammandHandler(vector<Employee>& employees, vector<Team>& teams,
 		}
 		else if (words[0] == "show_salary_config")
 		{
-			//showSalaryConfig(salaryConfigs, words[1]);
+			showSalaryConfig(salaryConfigs, words[1]);
 		}
 		else if (words[0] == "update_salary_config")
 		{

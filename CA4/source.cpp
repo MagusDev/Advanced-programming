@@ -406,6 +406,18 @@ void reportTeamSalary(const vector<Team>& teams, int teamID) {
 	}
 }
 
+void reportTotalHoursPerDay(vector<WorkingHour> workingHours,int startDay,int endDay) {
+	for (int day = startDay; day <= endDay; day++) {
+		int totalHours = 0;
+		for (auto wh : workingHours) {
+			if (wh.getDay() == day) {
+				totalHours += wh.getIntervalLength();
+			}
+		}
+		cout << "Day #" << day << ": " <<totalHours<< endl;
+	}
+}
+
 void cammandHandler(vector<Employee>& employees, vector<Team>& teams,
 					vector<WorkingHour>& workingHours, vector<SalaryConfig>& salaryConfigs) {
 	string line;
@@ -427,7 +439,7 @@ void cammandHandler(vector<Employee>& employees, vector<Team>& teams,
 		}
 		else if (words[0] == "report_total_hours_per_day")
 		{
-			//reportTotalHoursPerDay(workingHours, stoi(words[1]), stoi(words[2]));
+			reportTotalHoursPerDay(workingHours, stoi(words[1]), stoi(words[2]));
 		}
 		else if (words[0] == "report_employee_per_hour")
 		{

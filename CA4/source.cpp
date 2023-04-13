@@ -408,6 +408,50 @@ void reportTeamSalary(const vector<Team>& teams, int teamID) {
 	}
 }
 
+
+int calcTotalHoursInDay(vector<WorkingHour> workingHours, int day) {
+	int totalHours = 0;
+	for (auto wh : workingHours) {
+		if (wh.getDay() == day) {
+			totalHours += wh.getIntervalLength();
+		}
+	}
+	return totalHours;
+}
+
+
+vector<int> getMaxIndices(vector<int> v) {
+	int maxValue = v[0];
+	vector<int> maxIndices = { 0 };
+
+	for (int i = 1; i < v.size(); i++) {
+		if (v[i] > maxValue) {
+			maxValue = v[i];
+			maxIndices.clear();
+			maxIndices.push_back(i);
+		}
+		else if (v[i] == maxValue) {
+			maxIndices.push_back(i);
+		}
+	}
+	return maxIndices;
+}
+
+vector<int> getMinIndices(vector<int> v) {
+	int minValue = v[0];
+	vector<int> minIndices = { 0 };
+
+	for (int i = 1; i < v.size(); i++) {
+		if (v[i] < minValue) {
+			minValue = v[i];
+			minIndices.clear();
+			minIndices.push_back(i);
+		}
+		else if (v[i] == minValue) {
+			minIndices.push_back(i);
+}
+    
+    
 void reportTotalHoursPerDay(vector<WorkingHour> workingHours, int startDay, int endDay) {
 	for (int day = startDay; day <= endDay; day++) {
 		int totalHours = 0;
@@ -430,8 +474,42 @@ void showSalaryConfig(const vector<SalaryConfig>& salaryConfigs, string level) {
 	}
 	if (!isFound) {
 		cout << INVALID_LEVEL << endl;
+
 	}
+	return minIndices;
 }
+
+void reportTotalHoursPerDay(vector<WorkingHour> workingHours, int startDay, int endDay) {
+	vector<int> results;
+	for (int day = startDay; day <= endDay; day++) {
+		results.push_back(calcTotalHoursInDay(workingHours, day));
+		
+	}
+
+	int i = 0;
+	for (int day = startDay; day <= endDay; day++) {
+		cout << "Day #" << day << ": " << results[i] << endl;
+		i++;
+	}
+
+	cout << LINE_SEPARATOR << endl;
+
+	vector<int> minDays = getMinIndices(results);
+	vector<int> maxDays = getMaxIndices(results);
+	cout << "Day(s) with Max Working Hours: ";
+	for (int i : maxDays) {
+		cout << i + startDay << " ";
+	}
+	cout << endl;
+
+	cout << "Day(s) with Min Working Hours: ";
+	for (int i : minDays) {
+		cout << i + startDay << " ";
+	}
+	cout << endl;
+
+}
+
 
 void cammandHandler(vector<Employee>& employees, vector<Team>& teams,
 	vector<WorkingHour>& workingHours, vector<SalaryConfig>& salaryConfigs) {

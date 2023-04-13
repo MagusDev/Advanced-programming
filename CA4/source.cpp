@@ -450,7 +450,9 @@ vector<int> getMinIndices(vector<int> v) {
 		else if (v[i] == minValue) {
 			minIndices.push_back(i);
 		}
+	}
 	return minIndices;
+	
 		
 }
     

@@ -449,6 +449,9 @@ vector<int> getMinIndices(vector<int> v) {
 		}
 		else if (v[i] == minValue) {
 			minIndices.push_back(i);
+		}
+	return minIndices;
+		
 }
     
     
@@ -465,7 +468,7 @@ void showSalaryConfig(const vector<SalaryConfig>& salaryConfigs, string level) {
 		cout << INVALID_LEVEL << endl;
 
 	}
-	return minIndices;
+
 }
 
 void reportTotalHoursPerDay(vector<WorkingHour> workingHours, int startDay, int endDay) {

@@ -452,17 +452,6 @@ vector<int> getMinIndices(vector<int> v) {
 }
     
     
-void reportTotalHoursPerDay(vector<WorkingHour> workingHours, int startDay, int endDay) {
-	for (int day = startDay; day <= endDay; day++) {
-		int totalHours = 0;
-		for (auto wh : workingHours) {
-			if (wh.getDay() == day) {
-				totalHours += wh.getIntervalLength();
-			}
-		}
-		cout << "Day #" << day << ": " << totalHours << endl;
-	}
-}
 
 void showSalaryConfig(const vector<SalaryConfig>& salaryConfigs, string level) {
 	bool isFound = false;

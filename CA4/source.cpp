@@ -257,6 +257,10 @@ public:
 		return team_id;
 	}
 
+	void updateBonus(int _bonus) {
+		bonus = _bonus;
+	}
+
 	void assignMembers(vector<Employee>& _employees) {
 		for (int e = 0; e < _employees.size(); e++) {
 			if (find(memberIDs.begin(), memberIDs.end(), _employees[e].getID()) != memberIDs.end()) {
@@ -584,6 +588,36 @@ void updateSalaryConfig(vector<SalaryConfig>& salaryConfig, string level, int ba
 	}
 }
 
+bool isValidPersentage(int persentage) {
+	if (persentage > 100 || persentage < 0) {
+		return false;
+	}
+	else {
+		return true;
+	}
+}
+
+
+void updateTeamBonus(vector<Team>& teams, int teamID, int bonusPercentage) {
+	if (!isValidPersentage(bonusPercentage)) {
+		cout << INVALID_ARGUMENTS << endl;
+		return;
+	}
+	bool isFound = false;
+	for (int i = 0; i < teams.size(); i++) {
+		if (teams[i].getTeamID() == teamID) {
+			teams[i].updateBonus(bonusPercentage);
+			isFound = true;
+		}
+	}
+	if (!isFound) {
+		cout << TEAM_NOT_FOUND << endl;
+	}
+	else {
+		cout << OK << endl;
+	}
+}
+
 
 void commandHandler(vector<Employee>& employees, vector<Team>& teams,
 	vector<WorkingHour>& workingHours, vector<SalaryConfig>& salaryConfigs) {
@@ -632,7 +666,7 @@ void commandHandler(vector<Employee>& employees, vector<Team>& teams,
 		}
 		else if (words[0] == "update_team_bonus")
 		{
-			//updateTeamBonus(teams, stoi(words[1]), stoi(words[2]));
+			updateTeamBonus(teams, stoi(words[1]), stoi(words[2]));
 		}
 		else if (words[0] == "find_teams_for_bonus")
 		{

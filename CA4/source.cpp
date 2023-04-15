@@ -171,6 +171,17 @@ public:
 		return id;
 	}
 
+	void removeWorkingHoursForDay(int day) {
+		for (auto it = workingHours.begin(); it != workingHours.end(); ) {
+			if ((*it)->getDay() == day) {
+				it = workingHours.erase(it); // remove the element from the vector
+			}
+			else {
+				++it;
+			}
+		}
+	}
+
 	string getName() {
 		return name;
 	}
@@ -539,7 +550,7 @@ void reportEmployeePerHour(vector<WorkingHour> workingHours, int startHour, int 
 		cout << INVALID_ARGUMENTS << endl;
 		return;
 	}
-	
+
 	vector<float> avgs;
 	for (int hour = startHour; hour < endHour; hour++) {
 		avgs.push_back(round((calcTotalEmployeesInHour(workingHours, hour) / 30.0) * 10) / 10.0f);
@@ -548,10 +559,10 @@ void reportEmployeePerHour(vector<WorkingHour> workingHours, int startHour, int 
 
 	int i = 0;
 	for (int hour = startHour; hour < endHour; hour++) {
-		cout << hour << TIME_SEPARATOR << hour + 1 << ": " << avgs[i] <<endl;
+		cout << hour << TIME_SEPARATOR << hour + 1 << ": " << avgs[i] << endl;
 		i++;
 	}
-	
+
 	cout << LINE_SEPARATOR << endl;
 
 	vector<int> minHours = getMinIndices(avgs);
@@ -619,6 +630,28 @@ void updateTeamBonus(vector<Team>& teams, int teamID, int bonusPercentage) {
 }
 
 
+void deleteWorkingHours(vector<Employee> &employees,vector <WorkingHour> &workingHours, int ID, int day){
+	for (int i = 0; i < employees.size(); i++) {
+		if (employees[i].getID() == ID) {
+			employees[i].removeWorkingHoursForDay(day);
+		}
+	}
+
+	vector<WorkingHour>::iterator it;
+	it = workingHours.begin(); 
+	while (it != workingHours.end()) { 
+		if (it->getDay() == day) { 
+			it = workingHours.erase(it); 
+		}
+		else {
+			it++; 
+		}
+	}
+
+	cout << OK << endl;
+	
+}
+
 void commandHandler(vector<Employee>& employees, vector<Team>& teams,
 	vector<WorkingHour>& workingHours, vector<SalaryConfig>& salaryConfigs) {
 	string line;
@@ -662,7 +695,7 @@ void commandHandler(vector<Employee>& employees, vector<Team>& teams,
 		}
 		else if (words[0] == "delete_working_hours")
 		{
-			//deleteWorkingHours(employees, stoi(words[1]), stoi(words[2]));
+			deleteWorkingHours(employees, workingHours, stoi(words[1]), stoi(words[2]));
 		}
 		else if (words[0] == "update_team_bonus")
 		{

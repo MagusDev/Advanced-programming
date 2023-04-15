@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <unordered_set>
 #include <cmath>
+#include <iomanip>
 using namespace std;
 
 const char TIME_SEPARATOR = '-';
@@ -52,7 +53,7 @@ public:
 
 		return salary;
 	}
-	
+
 	void printConfig() {
 		cout << "Base Salary: " << baseSalary << endl;
 		cout << "Salary Per Hour: " << salaryPerHour << endl;
@@ -90,6 +91,14 @@ public:
 
 	int getDay() {
 		return day;
+	}
+
+	int getStartHour() {
+		return startHour;
+	}
+
+	int getEndHour() {
+		return endHour;
 	}
 
 	int getIntervalLength() {
@@ -187,7 +196,7 @@ public:
 		return config->calcTotalEarning(getTotalWorkingHours());
 	}
 
-	void assignConfig(vector<SalaryConfig> &configs) {
+	void assignConfig(vector<SalaryConfig>& configs) {
 		for (int c = 0; c < configs.size(); c++) {
 			if (configs[c].getLevel() == level) {
 				config = &configs[c];
@@ -408,7 +417,6 @@ void reportTeamSalary(const vector<Team>& teams, int teamID) {
 	}
 }
 
-
 int calcTotalHoursInDay(vector<WorkingHour> workingHours, int day) {
 	int totalHours = 0;
 	for (auto wh : workingHours) {
@@ -418,7 +426,6 @@ int calcTotalHoursInDay(vector<WorkingHour> workingHours, int day) {
 	}
 	return totalHours;
 }
-
 
 vector<int> getMaxIndices(vector<int> v) {
 	int maxValue = v[0];
@@ -452,11 +459,9 @@ vector<int> getMinIndices(vector<int> v) {
 		}
 	}
 	return minIndices;
-	
-		
+
+
 }
-    
-    
 
 void showSalaryConfig(const vector<SalaryConfig>& salaryConfigs, string level) {
 	bool isFound = false;
@@ -477,7 +482,7 @@ void reportTotalHoursPerDay(vector<WorkingHour> workingHours, int startDay, int 
 	vector<int> results;
 	for (int day = startDay; day <= endDay; day++) {
 		results.push_back(calcTotalHoursInDay(workingHours, day));
-		
+
 	}
 
 	int i = 0;
@@ -504,7 +509,6 @@ void reportTotalHoursPerDay(vector<WorkingHour> workingHours, int startDay, int 
 
 }
 
-		
 int calcTotalEmployeesInHour(vector<WorkingHour> workingHours, int hour) {
 	int totalEmployees = 0;
 	for (auto wh : workingHours) {
@@ -547,9 +551,9 @@ void reportEmployeePerHour(vector<WorkingHour> workingHours, int startHour, int 
 	cout << endl;
 
 }
-		
 
-void cammandHandler(vector<Employee>& employees, vector<Team>& teams,
+
+void commandHandler(vector<Employee>& employees, vector<Team>& teams,
 	vector<WorkingHour>& workingHours, vector<SalaryConfig>& salaryConfigs) {
 	string line;
 	while (getline(cin, line))
@@ -574,7 +578,7 @@ void cammandHandler(vector<Employee>& employees, vector<Team>& teams,
 		}
 		else if (words[0] == "report_employee_per_hour")
 		{
-			reportEmployeePerHour(employees, stoi(words[1]), stoi(words[2]));
+			reportEmployeePerHour(workingHours, stoi(words[1]), stoi(words[2]));
 		}
 		else if (words[0] == "show_salary_config")
 		{
@@ -616,7 +620,7 @@ int main() {
 	assignWorkingHoursToEmployees(employees, workingHours);
 	vector<Team> teams = initTeams(readCSV("teams.csv"), employees);
 
-	cammandHandler(employees, teams, workingHours, salaryConfigs);
+	commandHandler(employees, teams, workingHours, salaryConfigs);
 
 	/*
 	for (int i = 0; i < employees.size(); i++)

@@ -7,6 +7,7 @@
 #include <unordered_set>
 #include <cmath>
 #include <iomanip>
+#include <algorithm>
 using namespace std;
 
 const char TIME_SEPARATOR = '-';
@@ -17,6 +18,8 @@ const int WORKING_DAYS = 30;
 const string EMPLOYEE_NOT_FOUND = "EMPLOYEE_NOT_FOUND";
 const string TEAM_NOT_FOUND = "TEAM_NOT_FOUND";
 const string INVALID_LEVEL = "INVALID_LEVEL";
+const string INVALID_ARGUMENTS = "INVALID_ARGUMENTS";
+const string OK = "OK";
 
 class SalaryConfig {
 public:
@@ -427,8 +430,8 @@ int calcTotalHoursInDay(vector<WorkingHour> workingHours, int day) {
 	return totalHours;
 }
 
-vector<int> getMaxIndices(vector<int> v) {
-	int maxValue = v[0];
+vector<int> getMaxIndices(vector<float> v) {
+	float maxValue = v[0];
 	vector<int> maxIndices = { 0 };
 
 	for (int i = 1; i < v.size(); i++) {
@@ -444,8 +447,8 @@ vector<int> getMaxIndices(vector<int> v) {
 	return maxIndices;
 }
 
-vector<int> getMinIndices(vector<int> v) {
-	int minValue = v[0];
+vector<int> getMinIndices(vector<float> v) {
+	float minValue = v[0];
 	vector<int> minIndices = { 0 };
 
 	for (int i = 1; i < v.size(); i++) {
@@ -479,7 +482,13 @@ void showSalaryConfig(const vector<SalaryConfig>& salaryConfigs, string level) {
 }
 
 void reportTotalHoursPerDay(vector<WorkingHour> workingHours, int startDay, int endDay) {
-	vector<int> results;
+	
+	if (startDay < 1 || startDay > 30 || endDay < 1 || endDay > 30 || startDay > endDay) {
+		cout << INVALID_ARGUMENTS << endl;
+		return;
+	}
+
+	vector<float> results;
 	for (int day = startDay; day <= endDay; day++) {
 		results.push_back(calcTotalHoursInDay(workingHours, day));
 
@@ -521,23 +530,28 @@ int calcTotalEmployeesInHour(vector<WorkingHour> workingHours, int hour) {
 }
 
 void reportEmployeePerHour(vector<WorkingHour> workingHours, int startHour, int endHour) {
+
+	if (startHour < 0 || startHour > 24 || endHour < 0 || endHour > 24 || startHour > endHour) {
+		cout << INVALID_ARGUMENTS << endl;
+		return;
+	}
 	
-	vector<int> EmployeeCounts;
+	vector<float> avgs;
 	for (int hour = startHour; hour < endHour; hour++) {
-		EmployeeCounts.push_back(calcTotalEmployeesInHour(workingHours, hour));
+		avgs.push_back(round((calcTotalEmployeesInHour(workingHours, hour) / 30.0) * 10) / 10.0f);
 
 	}
 
 	int i = 0;
 	for (int hour = startHour; hour < endHour; hour++) {
-		cout << hour << TIME_SEPARATOR << hour + 1 << ": "<< fixed << setprecision(1) << EmployeeCounts[i]/ 30.0 <<endl;
+		cout << hour << TIME_SEPARATOR << hour + 1 << ": " << avgs[i] <<endl;
 		i++;
 	}
 	
 	cout << LINE_SEPARATOR << endl;
 
-	vector<int> minHours = getMinIndices(EmployeeCounts);
-	vector<int> maxHours = getMaxIndices(EmployeeCounts);
+	vector<int> minHours = getMinIndices(avgs);
+	vector<int> maxHours = getMaxIndices(avgs);
 	cout << "Period(s) with Max Working Employees: ";
 	for (int i : maxHours) {
 		cout << i + startHour << TIME_SEPARATOR << i + startHour + 1 << " ";
@@ -550,6 +564,24 @@ void reportEmployeePerHour(vector<WorkingHour> workingHours, int startHour, int 
 	}
 	cout << endl;
 
+}
+
+void updateSalaryConfig(vector<SalaryConfig>& salaryConfig, string level, int baseSalary,
+	int salaryPerHour, int salaryPerExtraHour, int officialWorkingHours, int taxPercentage) {
+	bool isFound = false;
+	for (int i = 0; i < salaryConfig.size(); i++) {
+		if (salaryConfig[i].getLevel() == level) {
+			SalaryConfig sc(level, baseSalary, salaryPerHour, salaryPerExtraHour, officialWorkingHours, taxPercentage);
+			salaryConfig[i] = sc;
+			isFound = true;
+		}
+	}
+	if (!isFound) {
+		cout << INVALID_LEVEL << endl;
+	}
+	else {
+		cout << OK << endl;
+	}
 }
 
 
@@ -586,8 +618,8 @@ void commandHandler(vector<Employee>& employees, vector<Team>& teams,
 		}
 		else if (words[0] == "update_salary_config")
 		{
-			//updateSalaryConfig(salaryConfigs, words[1], stoi(words[2]),
-			//					stoi(words[3]), stoi(words[4]), stoi(words[5]), stoi(words[6]));
+			updateSalaryConfig(salaryConfigs, words[1], stoi(words[2]),
+								stoi(words[3]), stoi(words[4]), stoi(words[5]), stoi(words[6]));
 		}
 		else if (words[0] == "add_working_hours")
 		{

@@ -510,6 +510,50 @@ void reportTotalHoursPerDay(vector<WorkingHour> workingHours, int startDay, int 
 
 }
 
+		
+int calcTotalEmployeesInHour(vector<WorkingHour> workingHours, int hour) {
+	int totalEmployees = 0;
+	for (auto wh : workingHours) {
+		if (hour >= wh.getStartHour() && hour + 1 <= wh.getEndHour()) {
+			totalEmployees++;
+		}
+	}
+
+	return totalEmployees;
+}
+
+void reportEmployeePerHour(vector<WorkingHour> workingHours, int startHour, int endHour) {
+	
+	vector<int> EmployeeCounts;
+	for (int hour = startHour; hour < endHour; hour++) {
+		EmployeeCounts.push_back(calcTotalEmployeesInHour(workingHours, hour));
+
+	}
+
+	int i = 0;
+	for (int hour = startHour; hour < endHour; hour++) {
+		cout << hour << TIME_SEPARATOR << hour + 1 << ": "<< fixed << setprecision(1) << EmployeeCounts[i]/ 30.0 <<endl;
+		i++;
+	}
+	
+	cout << LINE_SEPARATOR << endl;
+
+	vector<int> minHours = getMinIndices(EmployeeCounts);
+	vector<int> maxHours = getMaxIndices(EmployeeCounts);
+	cout << "Period(s) with Max Working Employees: ";
+	for (int i : maxHours) {
+		cout << i + startHour << TIME_SEPARATOR << i + startHour + 1 << " ";
+	}
+	cout << endl;
+
+	cout << "Period(s) with Min Working Employees: ";
+	for (int i : minHours) {
+		cout << i + startHour << TIME_SEPARATOR << i + startHour + 1 << " ";
+	}
+	cout << endl;
+
+}
+		
 
 void cammandHandler(vector<Employee>& employees, vector<Team>& teams,
 	vector<WorkingHour>& workingHours, vector<SalaryConfig>& salaryConfigs) {
@@ -536,7 +580,7 @@ void cammandHandler(vector<Employee>& employees, vector<Team>& teams,
 		}
 		else if (words[0] == "report_employee_per_hour")
 		{
-			//reportEmployeePerHour(employees, stoi(words[1]), stoi(words[2]));
+			reportEmployeePerHour(employees, stoi(words[1]), stoi(words[2]));
 		}
 		else if (words[0] == "show_salary_config")
 		{

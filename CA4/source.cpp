@@ -42,13 +42,13 @@ public:
 		return calcRawSalary(hours) * (100 - taxPercentage) / 100.0f;
 	}
 
-	int calcTax(int hours) {
-		return round(calcRawSalary(hours) * taxPercentage / 100.0f);
+	float calcTax(int hours) {
+		return calcRawSalary(hours) * taxPercentage / 100.0f;
 	}
 
-	float calcRawSalary(int hours)
+	int calcRawSalary(int hours)
 	{
-		float salary = baseSalary;
+		int salary = baseSalary;
 		if (hours < officialWorkingHours) {
 			salary += hours * salaryPerHour;
 		}
@@ -57,6 +57,10 @@ public:
 		}
 
 		return salary;
+	}
+
+	float getTaxPercentage() {
+		return taxPercentage;
 	}
 
 	void printConfig() {
@@ -182,8 +186,8 @@ public:
 		cout << "Total Working Hours: " << getTotalWorkingHours() << endl;
 		cout << "Absent Days: " << getAbsentDays() << endl;
 		cout << "Salary: " << getRawSalary() << endl;
-		cout << "Bonus: " << getBonusAmount() << endl;
-		cout << "Tax: " << getTax() << endl;
+		cout << "Bonus: " << int(round(getRawSalary() * (bonus / 100.0f))) << endl;
+		cout << "Tax: " << int(round(getTax())) << endl;
 		cout << "Total Earning: " << getTotalEarning() << endl;
 	}
 
@@ -247,8 +251,8 @@ public:
 		return config->calcRawSalary(getTotalWorkingHours());
 	}
 
-	int getTax() {
-		return config->calcTax(getTotalWorkingHours());
+	float getTax() {
+		return config->calcTax(getTotalWorkingHours()) + getRawSalary() * bonus * config->getTaxPercentage() / 10000.0f;
 	}
 
 	float getNoBonusTotalEarning() {
@@ -619,7 +623,7 @@ void reportEmployeePerHour(vector<WorkingHour*> workingHours, int startHour, int
 
 	vector<float> avgs;
 	for (int hour = startHour; hour < endHour; hour++) {
-		avgs.push_back(round((calcTotalEmployeesInHour(workingHours, hour) / 30.0) * 10) / 10.0f);
+		avgs.push_back(round((calcTotalEmployeesInHour(workingHours, hour) / 30.0f) * 10) / 10.0f);
 
 	}
 

@@ -199,7 +199,7 @@ public:
 				continue;
 			}
 
-			if (w->hasOverlap( _workingHour->getStartHour(), _workingHour->getEndHour())) {
+			if (w->hasOverlap(_workingHour->getStartHour(), _workingHour->getEndHour())) {
 				return true;
 			}
 		}
@@ -311,7 +311,7 @@ public:
 		cout << "Head ID: " << teamHead->getID() << endl;
 		cout << "Head Name: " << teamHead->getName() << endl;
 		cout << "Team Total Working Hours: " << getTotalWorkingHours() << endl;
-		cout << "Average Member Working Hour: " << fixed << setprecision(1) << round(getTotalWorkingHours() / (float)members.size() * 10) / 10.0f << endl;
+		cout << "Average Member Working Hours: " << fixed << setprecision(1) << round(getTotalWorkingHours() / (float)members.size() * 10) / 10.0f << endl;
 		cout << "Bonus: " << bonus << endl;
 		cout << LINE_SEPARATOR << endl;
 		for (auto m : members) {
@@ -581,13 +581,19 @@ void reportTotalHoursPerDay(vector<WorkingHour*> workingHours, int startDay, int
 	vector<int> maxDays = getMaxIndices(results);
 	cout << "Day(s) with Max Working Hours: ";
 	for (int i : maxDays) {
-		cout << i + startDay << " ";
+		cout << i + startDay;
+		if (i != maxDays[maxDays.size() - 1]) {
+			cout << ' ';
+		}
 	}
 	cout << endl;
 
 	cout << "Day(s) with Min Working Hours: ";
 	for (int i : minDays) {
-		cout << i + startDay << " ";
+		cout << i + startDay;
+		if (i != minDays[minDays.size() - 1]) {
+			cout << ' ';
+		}
 	}
 	cout << endl;
 
@@ -623,21 +629,21 @@ void reportEmployeePerHour(vector<WorkingHour*> workingHours, int startHour, int
 		i++;
 	}
 
-cout << LINE_SEPARATOR << endl;
+	cout << LINE_SEPARATOR << endl;
 
-vector<int> minHours = getMinIndices(avgs);
-vector<int> maxHours = getMaxIndices(avgs);
-cout << "Period(s) with Max Working Employees: ";
-for (int i : maxHours) {
-	cout << i + startHour << TIME_SEPARATOR << i + startHour + 1 << " ";
-}
-cout << endl;
+	vector<int> minHours = getMinIndices(avgs);
+	vector<int> maxHours = getMaxIndices(avgs);
+	cout << "Period(s) with Max Working Employees: ";
+	for (int i : maxHours) {
+		cout << i + startHour << TIME_SEPARATOR << i + startHour + 1 << " ";
+	}
+	cout << endl;
 
-cout << "Period(s) with Min Working Employees: ";
-for (int i : minHours) {
-	cout << i + startHour << TIME_SEPARATOR << i + startHour + 1 << " ";
-}
-cout << endl;
+	cout << "Period(s) with Min Working Employees: ";
+	for (int i : minHours) {
+		cout << i + startHour << TIME_SEPARATOR << i + startHour + 1 << " ";
+	}
+	cout << endl;
 
 }
 
@@ -722,8 +728,8 @@ void deleteWorkingHours(vector<Employee>& employees, vector <WorkingHour*>& work
 
 }
 
-void addWorkingHours(vector<Employee> &employees, vector<WorkingHour*> &workingHours, int ID, 
-					int day, int startHour, int endHour) {
+void addWorkingHours(vector<Employee> &employees, vector<WorkingHour*> &workingHours, int ID,
+	int day, int startHour, int endHour) {
 
 	if (day > WORKING_DAYS || day < 1 || startHour < 0 || startHour > 24 ||
 		endHour < 0 || endHour > 24 || startHour > endHour) {
@@ -795,7 +801,7 @@ void commandHandler(vector<Employee>& employees, vector<Team>& teams,
 		else if (words[0] == "add_working_hours")
 		{
 			addWorkingHours(employees, workingHours, stoi(words[1]), stoi(words[2]),
-														stoi(words[3]), stoi(words[4]));
+				stoi(words[3]), stoi(words[4]));
 		}
 		else if (words[0] == "delete_working_hours")
 		{
@@ -824,6 +830,6 @@ int main() {
 	vector<Team> teams = initTeams(readCSV("teams.csv"), employees);
 
 	commandHandler(employees, teams, workingHours, salaryConfigs);
-	
+
 	return 0;
 }

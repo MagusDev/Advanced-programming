@@ -130,7 +130,7 @@ public:
 		name = _name;
 		age = _age;
 		level = _level;
-		team_id = -8888;
+		teamID = -8888;
 		bonus = 0;
 	}
 
@@ -147,16 +147,16 @@ public:
 		cout << "Name: " << name << endl;
 		cout << "Age: " << age << endl;
 		cout << "Level: " << level << endl;
-		if (team_id == NON_VALID) {
+		if (teamID == NON_VALID) {
 			cout << "Team ID: N/A" << endl;
 		}
 		else {
-			cout << "Team ID: " << team_id << endl;
+			cout << "Team ID: " << teamID << endl;
 		}
 		cout << "Total Working Hours: " << getTotalWorkingHours() << endl;
 		cout << "Absent Days: " << getAbsentDays() << endl;
 		cout << "Salary: " << getRawSalary() << endl;
-		cout << "Bonus: " << bonus << endl;
+		cout << "Bonus: " << getBonusAmount() << endl;
 		cout << "Tax: " << getTax() << endl;
 		cout << "Total Earning: " << getTotalEarning() << endl;
 	}
@@ -169,6 +169,10 @@ public:
 
 	int getID() {
 		return id;
+	}
+
+	int getTeamID() {
+		return teamID;
 	}
 
 	void removeWorkingHoursForDay(int day) {
@@ -194,8 +198,8 @@ public:
 		return totalWorkingHours;
 	}
 
-	void assignTeamID(int _team_id) {
-		team_id = _team_id;
+	void assignTeamID(int _teamID) {
+		teamID = _teamID;
 	}
 
 	int getRawSalary() {
@@ -206,8 +210,16 @@ public:
 		return config->calcTax(getTotalWorkingHours());
 	}
 
-	int getTotalEarning() {
+	int getNoBonusTotalEarning() {
 		return config->calcTotalEarning(getTotalWorkingHours());
+	}
+
+	int getTotalEarning() {
+		return getNoBonusTotalEarning() + getBonusAmount();
+	}
+
+	int getBonusAmount() {
+		return getNoBonusTotalEarning() * (bonus / 100.0f);
 	}
 
 	void assignConfig(vector<SalaryConfig>& configs) {
@@ -218,6 +230,10 @@ public:
 		}
 	}
 
+	void assignBonus(int _bonus) {
+		bonus = _bonus;
+	}
+
 private:
 	int id;
 	string name;
@@ -225,7 +241,7 @@ private:
 	string level;
 	SalaryConfig* config;
 	vector<WorkingHour*> workingHours;
-	int team_id;
+	int teamID;
 	int bonus;
 
 	int getAbsentDays() {
@@ -270,6 +286,9 @@ public:
 
 	void updateBonus(int _bonus) {
 		bonus = _bonus;
+		for (int m = 0; m < members.size(); m++) {
+			members[m]->assignBonus(_bonus);
+		}
 	}
 
 	void assignMembers(vector<Employee>& _employees) {
@@ -497,8 +516,8 @@ void showSalaryConfig(const vector<SalaryConfig>& salaryConfigs, string level) {
 }
 
 void reportTotalHoursPerDay(vector<WorkingHour> workingHours, int startDay, int endDay) {
-	
-	if (startDay < 1 || startDay > 30 || endDay < 1 || endDay > 30 || startDay > endDay) {
+
+	if (startDay < 1 || startDay > WORKING_DAYS || endDay < 1 || endDay > WORKING_DAYS || startDay > endDay) {
 		cout << INVALID_ARGUMENTS << endl;
 		return;
 	}
@@ -615,9 +634,9 @@ void updateTeamBonus(vector<Team>& teams, int teamID, int bonusPercentage) {
 		return;
 	}
 	bool isFound = false;
-	for (int i = 0; i < teams.size(); i++) {
-		if (teams[i].getTeamID() == teamID) {
-			teams[i].updateBonus(bonusPercentage);
+	for (int t = 0; t < teams.size(); t++) {
+		if (teams[t].getTeamID() == teamID) {
+			teams[t].updateBonus(bonusPercentage);
 			isFound = true;
 		}
 	}
@@ -630,7 +649,7 @@ void updateTeamBonus(vector<Team>& teams, int teamID, int bonusPercentage) {
 }
 
 
-void deleteWorkingHours(vector<Employee> &employees,vector <WorkingHour> &workingHours, int ID, int day){
+void deleteWorkingHours(vector<Employee> &employees, vector <WorkingHour> &workingHours, int ID, int day) {
 	for (int i = 0; i < employees.size(); i++) {
 		if (employees[i].getID() == ID) {
 			employees[i].removeWorkingHoursForDay(day);
@@ -638,18 +657,18 @@ void deleteWorkingHours(vector<Employee> &employees,vector <WorkingHour> &workin
 	}
 
 	vector<WorkingHour>::iterator it;
-	it = workingHours.begin(); 
-	while (it != workingHours.end()) { 
-		if (it->getDay() == day) { 
-			it = workingHours.erase(it); 
+	it = workingHours.begin();
+	while (it != workingHours.end()) {
+		if (it->getDay() == day) {
+			it = workingHours.erase(it);
 		}
 		else {
-			it++; 
+			it++;
 		}
 	}
 
 	cout << OK << endl;
-	
+
 }
 
 void commandHandler(vector<Employee>& employees, vector<Team>& teams,
@@ -686,7 +705,7 @@ void commandHandler(vector<Employee>& employees, vector<Team>& teams,
 		else if (words[0] == "update_salary_config")
 		{
 			updateSalaryConfig(salaryConfigs, words[1], stoi(words[2]),
-								stoi(words[3]), stoi(words[4]), stoi(words[5]), stoi(words[6]));
+				stoi(words[3]), stoi(words[4]), stoi(words[5]), stoi(words[6]));
 		}
 		else if (words[0] == "add_working_hours")
 		{

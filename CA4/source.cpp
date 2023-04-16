@@ -38,8 +38,8 @@ public:
 		return level;
 	}
 
-	int calcTotalEarning(int hours) {
-		return round(calcRawSalary(hours) * (100 - taxPercentage) / 100.0f);
+	float calcTotalEarning(int hours) {
+		return calcRawSalary(hours) * (100 - taxPercentage) / 100.0f;
 	}
 
 	int calcTax(int hours) {
@@ -251,7 +251,7 @@ public:
 		return config->calcTax(getTotalWorkingHours());
 	}
 
-	int getNoBonusTotalEarning() {
+	float getNoBonusTotalEarning() {
 		return config->calcTotalEarning(getTotalWorkingHours());
 	}
 

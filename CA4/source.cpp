@@ -20,6 +20,7 @@ const string TEAM_NOT_FOUND = "TEAM_NOT_FOUND";
 const string INVALID_LEVEL = "INVALID_LEVEL";
 const string INVALID_ARGUMENTS = "INVALID_ARGUMENTS";
 const string OK = "OK";
+const char PLACEHOLDER = '-';
 
 class SalaryConfig {
 public:
@@ -37,16 +38,16 @@ public:
 	}
 
 	int calcTotalEarning(int hours) {
-		return calcRawSalary(hours) * (100 - taxPercentage) / 100;
+		return round(calcRawSalary(hours) * (100 - taxPercentage) / 100);
 	}
 
 	int calcTax(int hours) {
 		return calcRawSalary(hours) * taxPercentage / 100;
 	}
 
-	int calcRawSalary(int hours)
+	float calcRawSalary(int hours)
 	{
-		int salary = 0;
+		float salary = baseSalary;
 		if (hours < officialWorkingHours) {
 			salary += hours * salaryPerHour;
 		}
@@ -65,6 +66,25 @@ public:
 		cout << "Tax: " << taxPercentage << "%" << endl;
 	}
 
+	void updateNewConfig(string _baseSalary, string _salaryPerHour, string _salaryPerExtraHour,
+						string _officialWorkingHours, string _taxPercentage) {
+		if (_baseSalary[0] != PLACEHOLDER) {
+			baseSalary = stoi(_baseSalary);
+		}
+		if (_salaryPerHour[0] != PLACEHOLDER) {
+			salaryPerHour = stoi(_salaryPerHour);
+		}
+		if (_salaryPerExtraHour[0] != PLACEHOLDER) {
+			salaryPerExtraHour = stoi(_salaryPerExtraHour);
+		}
+		if (_officialWorkingHours[0] != PLACEHOLDER) {
+			officialWorkingHours = stoi(_officialWorkingHours);
+		}
+		if (_taxPercentage[0] != PLACEHOLDER) {
+			taxPercentage = stoi(_taxPercentage);
+		}
+	}
+
 private:
 	string level;
 	int baseSalary;
@@ -72,6 +92,7 @@ private:
 	int salaryPerExtraHour;
 	int officialWorkingHours;
 	int taxPercentage;
+
 };
 
 class WorkingHour {
@@ -270,7 +291,7 @@ public:
 		cout << "Head ID: " << teamHead->getID() << endl;
 		cout << "Head Name: " << teamHead->getName() << endl;
 		cout << "Team Total Working Hours: " << getTotalWorkingHours() << endl;
-		cout << "Average Member Working Hour: " << round(getTotalWorkingHours() / members.size()) << endl;
+		cout << "Average Member Working Hour: " <<fixed<<setprecision(1)<< round(getTotalWorkingHours() / (float)members.size() * 10) / 10.0f << endl;
 		cout << "Bonus: " << bonus << endl;
 		cout << LINE_SEPARATOR << endl;
 		for (auto m : members) {
@@ -600,13 +621,12 @@ void reportEmployeePerHour(vector<WorkingHour> workingHours, int startHour, int 
 
 }
 
-void updateSalaryConfig(vector<SalaryConfig>& salaryConfig, string level, int baseSalary,
-	int salaryPerHour, int salaryPerExtraHour, int officialWorkingHours, int taxPercentage) {
+void updateSalaryConfig(vector<SalaryConfig>& salaryConfig, string level, string baseSalary,
+	string salaryPerHour, string salaryPerExtraHour, string officialWorkingHours, string taxPercentage) {
 	bool isFound = false;
 	for (int i = 0; i < salaryConfig.size(); i++) {
 		if (salaryConfig[i].getLevel() == level) {
-			SalaryConfig sc(level, baseSalary, salaryPerHour, salaryPerExtraHour, officialWorkingHours, taxPercentage);
-			salaryConfig[i] = sc;
+			salaryConfig[i].updateNewConfig(baseSalary, salaryPerHour, salaryPerExtraHour, officialWorkingHours, taxPercentage);
 			isFound = true;
 		}
 	}
@@ -704,8 +724,8 @@ void commandHandler(vector<Employee>& employees, vector<Team>& teams,
 		}
 		else if (words[0] == "update_salary_config")
 		{
-			updateSalaryConfig(salaryConfigs, words[1], stoi(words[2]),
-				stoi(words[3]), stoi(words[4]), stoi(words[5]), stoi(words[6]));
+			updateSalaryConfig(salaryConfigs, words[1], words[2],
+				words[3], words[4], words[5], words[6]);
 		}
 		else if (words[0] == "add_working_hours")
 		{

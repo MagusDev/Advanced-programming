@@ -39,11 +39,11 @@ public:
 	}
 
 	int calcTotalEarning(int hours) {
-		return round(calcRawSalary(hours) * (100 - taxPercentage) / 100);
+		return round(calcRawSalary(hours) * (100 - taxPercentage) / 100.0f);
 	}
 
 	int calcTax(int hours) {
-		return calcRawSalary(hours) * taxPercentage / 100;
+		return round(calcRawSalary(hours) * taxPercentage / 100.0f);
 	}
 
 	float calcRawSalary(int hours)
@@ -256,10 +256,10 @@ public:
 	}
 
 	int getTotalEarning() {
-		return getNoBonusTotalEarning() + getBonusAmount();
+		return round(getNoBonusTotalEarning() + getBonusAmount());
 	}
 
-	int getBonusAmount() {
+	float getBonusAmount() {
 		return getNoBonusTotalEarning() * (bonus / 100.0f);
 	}
 
@@ -728,7 +728,7 @@ void deleteWorkingHours(vector<Employee>& employees, vector <WorkingHour*>& work
 
 }
 
-void addWorkingHours(vector<Employee> &employees, vector<WorkingHour*> &workingHours, int ID,
+void addWorkingHours(vector<Employee>& employees, vector<WorkingHour*>& workingHours, int ID,
 	int day, int startHour, int endHour) {
 
 	if (day > WORKING_DAYS || day < 1 || startHour < 0 || startHour > 24 ||
